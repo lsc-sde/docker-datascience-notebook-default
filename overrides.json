@@ -1,0 +1,12 @@
+{
+    "@ryantam626/jupyterlab_code_formatter": 
+    {
+            "preferences": {
+                "default_formatter": {
+                    "python": "black",
+                    "R": "styler"
+                }
+            }
+        
+    }
+}
