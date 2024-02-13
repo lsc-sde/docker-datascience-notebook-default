@@ -23,9 +23,9 @@ USER root
 
 # Install essentials for code-server
 # Install XFCE and essential desktop tools
-RUN apt-get update --yes && \
-  apt-get upgrade && \
-  apt-get install --yes --quiet --no-install-recommends \
+RUN apt-get update --yes
+RUN apt-get upgrade --yes
+RUN apt-get install --yes --quiet --no-install-recommends \
   # ubuntu-mate-desktop \
   build-essential \
   clang \
@@ -47,11 +47,12 @@ RUN apt-get update --yes && \
   xubuntu-icon-theme \
   # Office suite
   gnumeric \
-  abiword \
-  && apt-get remove --yes --quiet light-locker \
-  && apt-get autoremove --yes --quiet \
-  && apt-get clean --quiet \
-  && rm -rf /var/lib/apt/lists/*
+  abiword
+
+RUN apt-get remove --yes --quiet light-locker
+RUN apt-get autoremove --yes --quiet
+RUN apt-get clean --quiet
+RUN rm -rf /var/lib/apt/lists/*
 
 
 # Install Code Server and extensions
