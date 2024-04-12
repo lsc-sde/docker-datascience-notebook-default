@@ -9,6 +9,7 @@
 
 # https://hub.docker.com/r/jupyter/datascience-notebook/tags/
 ARG OWNER=lscsde
+ARG TARGETPLATFORM
 ARG BASE_CONTAINER=jupyter/datascience-notebook:2023-09-25
 FROM $BASE_CONTAINER
 
@@ -60,9 +61,12 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ARG CODE_VERSION=4.17.0
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
-  && curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_VERSION/code-server_${CODE_VERSION}_${ARCHITECTURE}.deb \
-  && dpkg -i code-server_${CODE_VERSION}_${ARCHITECTURE}.deb \
-  && rm -f code-server_${CODE_VERSION}_${ARCHITECTURE}.deb
+  && export FILE_NAME="code-server_${CODE_VERSION}_${ARCHITECTURE}.deb" \
+  && export URL="https://github.com/coder/code-server/releases/download/v$CODE_VERSION/${FILE_NAME}" \
+  && echo "${URL}" \
+  && curl -fOL ${URL} \
+  && dpkg -i "${FILE_NAME}" \
+  && rm -f "${FILE_NAME}"
 
 RUN code-server --install-extension charliermarsh.ruff
 RUN code-server --install-extension davidanson.vscode-markdownlint
@@ -75,9 +79,12 @@ RUN code-server --install-extension quarto.quarto
 # Install Quarto
 ARG QUARTO_VERSION=1.3.450
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
-  && curl -fOL https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb \
-  && dpkg -i quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb \
-  && rm -f quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb
+  && export FILE_NAME="quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb" \
+  && export URL="https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/${FILE_NAME}" \
+  && echo "${URL}" \
+  && curl -fOL ${URL} \
+  && dpkg -i ${FILE_NAME} \
+  && rm -f ${FILE_NAME}
 
 # Install RStudio Server
 ARG RSTUDIO_VERSION=2023.09.0-463
