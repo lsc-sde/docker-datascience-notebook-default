@@ -58,7 +58,7 @@ RUN rm -rf /var/lib/apt/lists/*
 # Install Code Server and extensions
 # https://github.com/coder/code-server/tags
 
-ARG CODE_VERSION=4.17.0
+ARG CODE_VERSION=4.23.0
 RUN FILE_NAME="code-server_${CODE_VERSION}_${TARGETARCH}.deb" \
   && export URL="https://github.com/coder/code-server/releases/download/v$CODE_VERSION/${FILE_NAME}" \
   && echo "${URL}" \
