@@ -59,9 +59,10 @@ RUN rm -rf /var/lib/apt/lists/*
 # https://github.com/coder/code-server/tags
 
 ARG CODE_VERSION=4.17.0
-RUN curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_VERSION/code-server_${CODE_VERSION}_amd64.deb \
-  && dpkg -i code-server_${CODE_VERSION}_amd64.deb \
-  && rm -f code-server_${CODE_VERSION}_amd64.deb
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
+  && curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_VERSION/code-server_${CODE_VERSION}_${ARCHITECTURE}.deb \
+  && dpkg -i code-server_${CODE_VERSION}_${ARCHITECTURE}.deb \
+  && rm -f code-server_${CODE_VERSION}_${ARCHITECTURE}.deb
 
 RUN code-server --install-extension charliermarsh.ruff
 RUN code-server --install-extension davidanson.vscode-markdownlint
@@ -73,9 +74,10 @@ RUN code-server --install-extension quarto.quarto
 
 # Install Quarto
 ARG QUARTO_VERSION=1.3.450
-RUN  curl -fOL https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb \
-  && dpkg -i quarto-${QUARTO_VERSION}-linux-amd64.deb \
-  && rm -f quarto-${QUARTO_VERSION}-linux-amd64.deb
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
+  && curl -fOL https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb \
+  && dpkg -i quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb \
+  && rm -f quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb
 
 # Install RStudio Server
 ARG RSTUDIO_VERSION=2023.09.0-463
