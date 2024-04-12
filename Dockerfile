@@ -80,7 +80,7 @@ RUN  curl -fOL https://github.com/quarto-dev/quarto-cli/releases/download/v${QUA
 # Install RStudio Server
 ARG RSTUDIO_VERSION=2023.09.0-463
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
- && export RSTUDIO_URL="https://download2.rstudio.org/server/jammy/${ARCHITECTURE}/rstudio-server-${RSTUDIO_VERSION}-${ARCHITECTURE}.deb"
+ && export RSTUDIO_URL="https://download2.rstudio.org/server/jammy/${ARCHITECTURE}/rstudio-server-${RSTUDIO_VERSION}-${ARCHITECTURE}.deb" \
  && curl -fOL ${RSTUDIO_URL}
 RUN apt update
 RUN apt install --yes gdebi-core
