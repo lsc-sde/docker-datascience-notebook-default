@@ -61,14 +61,15 @@ RUN rm -rf /var/lib/apt/lists/*
 ARG CODE_VERSION=4.17.0
 RUN curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_VERSION/code-server_${CODE_VERSION}_amd64.deb \
   && dpkg -i code-server_${CODE_VERSION}_amd64.deb \
-  && rm -f code-server_${CODE_VERSION}_amd64.deb \
-  && code-server --install-extension charliermarsh.ruff \
-  && code-server --install-extension davidanson.vscode-markdownlint \
-  && code-server --install-extension ms-python.black-formatter \
-  && code-server --install-extension ms-python.python \
-  && code-server --install-extension ms-python.vscode-pylance \
-  && code-server --install-extension njpwerner.autodocstring \
-  && code-server --install-extension quarto.quarto
+  && rm -f code-server_${CODE_VERSION}_amd64.deb
+
+RUN code-server --install-extension charliermarsh.ruff
+RUN code-server --install-extension davidanson.vscode-markdownlint
+RUN code-server --install-extension ms-python.black-formatter
+RUN code-server --install-extension ms-python.python
+RUN code-server --install-extension ms-python.vscode-pylance
+RUN code-server --install-extension njpwerner.autodocstring
+RUN code-server --install-extension quarto.quarto
 
 # Install Quarto
 ARG QUARTO_VERSION=1.3.450
@@ -79,17 +80,19 @@ RUN  curl -fOL https://github.com/quarto-dev/quarto-cli/releases/download/v${QUA
 # Install RStudio Server
 ARG RSTUDIO_VERSION=2023.09.0-463
 ARG RSTUDIO_URL="https://download2.rstudio.org/server/jammy/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb"
+RUN curl -fOL ${RSTUDIO_URL}
+RUN apt update
+RUN apt install --yes gdebi-core
+
 RUN curl -fOL ${RSTUDIO_URL} \
-  && apt update && apt install --yes gdebi-core \
-  && curl -fOL ${RSTUDIO_URL} \
   && gdebi -n rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
-  && rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
-  && apt-get remove --yes gdebi-core \
-  && apt-get clean --quiet \
-  && rm -rf /var/lib/apt/lists/* \
+  && rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb
+RUN apt-get remove --yes gdebi-core \
+  && apt-get clean --quiet
+  && rm -rf /var/lib/apt/lists/*
   # &&  chown -R ${NB_USER} /var/log/rstudio-server \
   # && chown -R ${NB_USER} /var/lib/rstudio-server \
-  && echo server-user=${NB_USER} > /etc/rstudio/rserver.conf
+RUN echo server-user=${NB_USER} > /etc/rstudio/rserver.conf
 ENV PATH=$PATH:/usr/lib/rstudio-server/bin
 ENV RSESSION_PROXY_RSTUDIO_1_4=True
 
@@ -100,11 +103,11 @@ COPY jupyter_notebook_config.json /etc/jupyter/jupyter_notebook_config.json
 COPY environment.yaml environment.yaml
 
 # Install Python packages for proxying XFCE and code-server
-RUN  mamba env update --name base --file environment.yaml \
-  && rm environment.yaml \
-  && mamba clean --all -f -y \
-  && fix-permissions "${CONDA_DIR}" \
-  && fix-permissions "/home/${NB_USER}"
+RUN mamba env update --name base --file environment.yaml
+RUN rm environment.yaml
+RUN mamba clean --all -f -y 
+RUN fix-permissions "${CONDA_DIR}"
+RUN fix-permissions "/home/${NB_USER}"
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
