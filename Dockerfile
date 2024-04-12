@@ -88,7 +88,7 @@ RUN curl -fOL ${RSTUDIO_URL} \
   && gdebi -n rstudio-server-${RSTUDIO_VERSION}-amd64.deb \
   && rm rstudio-server-${RSTUDIO_VERSION}-amd64.deb
 RUN apt-get remove --yes gdebi-core \
-  && apt-get clean --quiet
+  && apt-get clean --quiet \
   && rm -rf /var/lib/apt/lists/*
   # &&  chown -R ${NB_USER} /var/log/rstudio-server \
   # && chown -R ${NB_USER} /var/lib/rstudio-server \
