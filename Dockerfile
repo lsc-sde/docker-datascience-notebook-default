@@ -70,7 +70,7 @@ RUN code-server --install-extension charliermarsh.ruff
 RUN code-server --install-extension davidanson.vscode-markdownlint
 RUN code-server --install-extension ms-python.black-formatter
 RUN code-server --install-extension ms-python.python
-RUN code-server --install-extension ms-python.vscode-pylance
+RUN code-server --install-extension ms-pyright.pyright
 RUN code-server --install-extension njpwerner.autodocstring
 RUN code-server --install-extension quarto.quarto
 
