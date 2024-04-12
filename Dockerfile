@@ -9,10 +9,9 @@
 
 # https://hub.docker.com/r/jupyter/datascience-notebook/tags/
 ARG OWNER=lscsde
-ARG TARGETPLATFORM
 ARG BASE_CONTAINER=jupyter/datascience-notebook:2023-09-25
 FROM $BASE_CONTAINER
-
+ARG TARGETOS TARGETARCH
 LABEL maintainer="lscsde"
 LABEL image="datascience-notebook-default"
 
@@ -60,8 +59,7 @@ RUN rm -rf /var/lib/apt/lists/*
 # https://github.com/coder/code-server/tags
 
 ARG CODE_VERSION=4.17.0
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
-  && export FILE_NAME="code-server_${CODE_VERSION}_${ARCHITECTURE}.deb" \
+RUN FILE_NAME="code-server_${CODE_VERSION}_${TARGETARCH}.deb" \
   && export URL="https://github.com/coder/code-server/releases/download/v$CODE_VERSION/${FILE_NAME}" \
   && echo "${URL}" \
   && curl -fOL ${URL} \
@@ -78,8 +76,7 @@ RUN code-server --install-extension quarto.quarto
 
 # Install Quarto
 ARG QUARTO_VERSION=1.3.450
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
-  && export FILE_NAME="quarto-${QUARTO_VERSION}-linux-${ARCHITECTURE}.deb" \
+RUN export FILE_NAME="quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
   && export URL="https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/${FILE_NAME}" \
   && echo "${URL}" \
   && curl -fOL ${URL} \
@@ -90,12 +87,12 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$
 ARG RSTUDIO_VERSION=2023.09.0-463
 RUN apt update
 RUN apt install --yes gdebi-core
-
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then ARCHITECTURE=arm; elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=amd64; fi \
- && export RSTUDIO_URL="https://download2.rstudio.org/server/jammy/${ARCHITECTURE}/rstudio-server-${RSTUDIO_VERSION}-${ARCHITECTURE}.deb" \
+RUN export FILE_NAME="rstudio-server-${RSTUDIO_VERSION}-${TARGETARCH}.deb" \
+ && export RSTUDIO_URL="https://download2.rstudio.org/server/jammy/${TARGETARCH}/${FILE_NAME}" \
+ && echo "${RSTUDIO_URL}" \
  && curl -fOL ${RSTUDIO_URL} \
- && gdebi -n rstudio-server-${RSTUDIO_VERSION}-${ARCHITECTURE}.deb \
- && rm rstudio-server-${RSTUDIO_VERSION}-${ARCHITECTURE}.deb
+ && gdebi -n ${FILE_NAME} \
+ && rm ${FILE_NAME}
 
  RUN apt-get remove --yes gdebi-core \
   && apt-get clean --quiet \
